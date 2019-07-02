@@ -1854,10 +1854,28 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
+  props: ['logged_user'],
   data: function data() {
     return {
-      users: []
+      users: [],
+      waiting: [],
+      in_game: []
     };
   },
   mounted: function mounted() {
@@ -1872,6 +1890,19 @@ __webpack_require__.r(__webpack_exports__);
         return u.id !== user.id;
       });
     });
+  },
+  methods: {
+    ready: function ready() {
+      var user = this.logged_user;
+      if (!(this.waiting.indexOf(user) > -1)) this.waiting.push(this.logged_user);else alert("You're Ready!");
+    },
+    unready: function unready() {
+      var _this2 = this;
+
+      this.waiting = this.waiting.filter(function (u) {
+        return u.id !== _this2.logged_user.id;
+      });
+    }
   }
 });
 
@@ -47318,16 +47349,84 @@ var render = function() {
   return _c("div", { staticClass: "container" }, [
     _c("div", { staticClass: "row justify-content-center" }, [
       _c("div", { staticClass: "col-md-8" }, [
+        _c(
+          "button",
+          {
+            staticClass: "btn btn-primary",
+            on: {
+              click: function($event) {
+                return _vm.ready()
+              }
+            }
+          },
+          [_vm._v("Ready")]
+        ),
+        _vm._v(" "),
+        _c(
+          "button",
+          {
+            staticClass: "btn btn-primary",
+            on: {
+              click: function($event) {
+                return _vm.unready()
+              }
+            }
+          },
+          [_vm._v("Unready")]
+        ),
+        _vm._v(" "),
         _c("div", { staticClass: "card" }, [
-          _c("div", { staticClass: "card-header" }, [
-            _vm._v("Players Waiting")
-          ]),
+          _c("div", { staticClass: "card-header" }, [_vm._v("Players online")]),
           _vm._v(" "),
           _c(
             "div",
             { staticClass: "card-body" },
             _vm._l(_vm.users, function(user) {
-              return _c("p", { domProps: { textContent: _vm._s(user.name) } })
+              return _c("a", {
+                staticClass: "badge badge-primary",
+                attrs: { href: "#" },
+                domProps: { textContent: _vm._s(user.name) }
+              })
+            }),
+            0
+          )
+        ]),
+        _vm._v(" "),
+        _c("hr"),
+        _vm._v(" "),
+        _c("div", { staticClass: "card" }, [
+          _c("div", { staticClass: "card-header" }, [_vm._v("Players ready")]),
+          _vm._v(" "),
+          _c(
+            "div",
+            { staticClass: "card-body" },
+            _vm._l(_vm.waiting, function(user) {
+              return _c("a", {
+                staticClass: "badge badge-primary",
+                attrs: { href: "#" },
+                domProps: { textContent: _vm._s(user.name) }
+              })
+            }),
+            0
+          )
+        ]),
+        _vm._v(" "),
+        _c("hr"),
+        _vm._v(" "),
+        _c("div", { staticClass: "card" }, [
+          _c("div", { staticClass: "card-header" }, [
+            _vm._v("Players in-game")
+          ]),
+          _vm._v(" "),
+          _c(
+            "div",
+            { staticClass: "card-body" },
+            _vm._l(_vm.in_game, function(user) {
+              return _c("a", {
+                staticClass: "badge badge-primary",
+                attrs: { href: "#" },
+                domProps: { textContent: _vm._s(user.name) }
+              })
             }),
             0
           )

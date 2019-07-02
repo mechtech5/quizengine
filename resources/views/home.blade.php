@@ -8,7 +8,7 @@
                 <div class="card-header">Lobby</div>
 
                 <div class="card-body">
-                    <lobby-component></lobby-component>
+                    <lobby-component :logged_user="{{ json_encode(auth()->user()) }}"></lobby-component>
                 </div>
             </div>
         </div>
