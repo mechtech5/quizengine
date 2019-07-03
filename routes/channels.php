@@ -18,3 +18,7 @@ Broadcast::channel('App.User.{id}', function ($user, $id) {
 Broadcast::channel('PlayersOnline', function ($user) {
   return $user;
 });
+
+Broadcast::channel('lobby', function ($user) {
+  return $user;
+});

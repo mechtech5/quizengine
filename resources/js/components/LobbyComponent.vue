@@ -7,8 +7,8 @@
             <div class="row justify-content-center">
               <button type="button" v-scroll-to="{ element: '#game', duration: 2000 }" style="display: none;" ref="scrollBtn"></button>
               <div class="col-md-8">
-                <button class="btn btn-primary" @click="ready()">Ready</button>
-                <button class="btn btn-primary float-right" @click="unready()">Unready</button>
+                <button class="btn btn-primary" @click="doReady()">Ready</button>
+                <button class="btn btn-primary float-right" @click="doUnready()">Unready</button>
                 <div class="card">
                   <div class="card-header">Players online</div>
                   <div class="card-body">
@@ -19,7 +19,7 @@
                 <div class="card">
                   <div class="card-header">Players ready</div>
                   <div class="card-body">
-                    <a href="#" v-for="user in waiting" class="badge badge-primary" v-text="user.name"></a>
+                    <a href="#" v-for="user in ready" class="badge badge-primary" v-text="user.name"></a>
                   </div>
                 </div>
                 <hr>
@@ -57,7 +57,7 @@
     data() {
       return {
         users: [],
-        waiting: [],
+        ready: [],
         in_game: []
       }
     },
@@ -71,21 +71,32 @@
         });
 
         this.scrollEvent();
+
+      Echo.private('lobby')
+		    .listen('Ready', (e) => {
+		        console.log(e.user);
+		        this.ready.push(e.user);
+		    });  
     },
     methods: {
       scrollEvent($event) {
         const elem = this.$refs.scrollBtn;
         elem.click();
       },
-      ready() {
+      doReady() {
         let user = this.logged_user;
-        if(!(this.waiting.indexOf(user) > -1))
-          this.waiting.push(this.logged_user);
-        else
+        if(!(this.ready.indexOf(user) > -1)){
+          axios.get(`/ready/${this.logged_user.id}`).then(response => {
+            
+          }).catch(error => console.log(error.response.data));
+
+          this.ready.push(this.logged_user);
+        }else{
           alert("You're Ready!");
+        }
       },
-      unready() {
-        this.waiting = this.waiting.filter(u => (u.id !== this.logged_user.id))
+      doUnready() {
+        this.ready = this.ready.filter(u => (u.id !== this.logged_user.id))
       }
     }
   }
