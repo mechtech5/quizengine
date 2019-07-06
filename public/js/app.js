@@ -1926,7 +1926,7 @@ Vue.use(VueScrollTo);
   data: function data() {
     return {
       users: [],
-      waiting: [],
+      ready: [],
       in_game: []
     };
   },
@@ -1943,20 +1943,33 @@ Vue.use(VueScrollTo);
       });
     });
     this.scrollEvent();
+    Echo["private"]('lobby').listen('Ready', function (e) {
+      console.log(e.user);
+
+      _this.ready.push(e.user);
+    });
   },
   methods: {
     scrollEvent: function scrollEvent($event) {
       var elem = this.$refs.scrollBtn;
       elem.click();
     },
-    ready: function ready() {
+    doReady: function doReady() {
       var user = this.logged_user;
-      if (!(this.waiting.indexOf(user) > -1)) this.waiting.push(this.logged_user);else alert("You're Ready!");
+
+      if (!(this.ready.indexOf(user) > -1)) {
+        axios.get("/ready/".concat(this.logged_user.id)).then(function (response) {})["catch"](function (error) {
+          return console.log(error.response.data);
+        });
+        this.ready.push(this.logged_user);
+      } else {
+        alert("You're Ready!");
+      }
     },
-    unready: function unready() {
+    doUnready: function doUnready() {
       var _this2 = this;
 
-      this.waiting = this.waiting.filter(function (u) {
+      this.ready = this.ready.filter(function (u) {
         return u.id !== _this2.logged_user.id;
       });
     }
@@ -47455,7 +47468,7 @@ var render = function() {
                   staticClass: "btn btn-primary",
                   on: {
                     click: function($event) {
-                      return _vm.ready()
+                      return _vm.doReady()
                     }
                   }
                 },
@@ -47468,7 +47481,7 @@ var render = function() {
                   staticClass: "btn btn-primary float-right",
                   on: {
                     click: function($event) {
-                      return _vm.unready()
+                      return _vm.doUnready()
                     }
                   }
                 },
@@ -47504,7 +47517,7 @@ var render = function() {
                 _c(
                   "div",
                   { staticClass: "card-body" },
-                  _vm._l(_vm.waiting, function(user) {
+                  _vm._l(_vm.ready, function(user) {
                     return _c("a", {
                       staticClass: "badge badge-primary",
                       attrs: { href: "#" },
@@ -60309,7 +60322,7 @@ if (token) {
 window.Pusher = __webpack_require__(/*! pusher-js */ "./node_modules/pusher-js/dist/web/pusher.js");
 window.Echo = new laravel_echo__WEBPACK_IMPORTED_MODULE_0__["default"]({
   broadcaster: 'pusher',
-  key: "5f0f3de930969bb51d71",
+  key: "5cae8d5a3c198a117d3b",
   cluster: "ap2",
   encrypted: true
 });
@@ -60472,8 +60485,8 @@ __webpack_require__.r(__webpack_exports__);
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! /Users/ayushlikhar/code/dream/quizengine/resources/js/app.js */"./resources/js/app.js");
-module.exports = __webpack_require__(/*! /Users/ayushlikhar/code/dream/quizengine/resources/sass/app.scss */"./resources/sass/app.scss");
+__webpack_require__(/*! D:\laragon\www\quizengine\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! D:\laragon\www\quizengine\resources\sass\app.scss */"./resources/sass/app.scss");
 
 
 /***/ })
