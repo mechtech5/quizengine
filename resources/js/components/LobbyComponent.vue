@@ -8,7 +8,7 @@
               <button type="button" v-scroll-to="{ element: '#game', duration: 2000 }" style="display: none;" ref="scrollBtn"></button>
               <div class="col-md-8">
                 <button class="btn btn-primary" @click="doReady()">Ready</button>
-                <button class="btn btn-primary float-right" @click="doUnready()">Unready</button>
+                <button class="btn btn-primary" @click="doUnready()">Unready</button>
                 <div class="card">
                   <div class="card-header">Players online</div>
                   <div class="card-body">
@@ -56,6 +56,7 @@
     components: {GameComponent},
     data() {
       return {
+        // userStatus: 'Unready',
         users: [],
         ready: [],
         in_game: []
@@ -70,13 +71,15 @@
           this.users = this.users.filter(u => (u.id !== user.id))
         });
 
-        this.scrollEvent();
+      // this.scrollEvent();
 
       Echo.private('lobby')
-		    .listen('Ready', (e) => {
-		        console.log(e.user);
-		        this.ready.push(e.user);
-		    });  
+        .listen('Ready', (e) => {
+          this.ready.push(e.user);
+        })
+        .listen('Unready', (e) => {
+          this.ready = this.ready.filter(u => (u.id !== e.user.id))
+        });        
     },
     methods: {
       scrollEvent($event) {
@@ -85,19 +88,24 @@
       },
       doReady() {
         let user = this.logged_user;
-        if(!(this.ready.indexOf(user) > -1)){
-          axios.get(`/ready/${this.logged_user.id}`).then(response => {
-            
+        if(!(this.ready.indexOf(user) > -1)) {
+          axios.get(`/ready/${user.id}`).then(response => {
+            this.ready.push(user);
           }).catch(error => console.log(error.response.data));
-
-          this.ready.push(this.logged_user);
-        }else{
+        } else {
           alert("You're Ready!");
         }
       },
       doUnready() {
-        this.ready = this.ready.filter(u => (u.id !== this.logged_user.id))
-      }
+        let user = this.logged_user;
+        if(!(this.ready.indexOf(user) < -1)) {
+          axios.get(`/unready/${user.id}`).then(response => {
+            this.ready = this.ready.filter(u => (u.id !== user.id))
+          }).catch(error => console.log(error.response.data));
+        } else {
+          alert("You're Ready!");
+        }
+      },
     }
   }
 </script>

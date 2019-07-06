@@ -17,7 +17,7 @@ class CreateQuestionsTable extends Migration
             $table->bigIncrements('id');
             $table->unsignedInteger('topic_id');
             $table->text('ques');
-            $table->json('options');
+            $table->text('options');
             $table->char('ans', 1);
             $table->timestamps();
         });

@@ -19,4 +19,10 @@ Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
 
-Route::get('/ready/{user}', 'LobbyController@ready');
+Route::get('/ready/{user}', 'HomeController@ready');
+Route::get('/unready/{user}', 'HomeController@unready');
+
+Route::resource('topic', 'TopicController');
+Route::resource('question', 'QuestionController');
+Route::resource('round', 'RoundController');
+

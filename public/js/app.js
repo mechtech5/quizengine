@@ -1925,6 +1925,7 @@ Vue.use(VueScrollTo);
   },
   data: function data() {
     return {
+      // userStatus: 'Unready',
       users: [],
       ready: [],
       in_game: []
@@ -1941,12 +1942,14 @@ Vue.use(VueScrollTo);
       _this.users = _this.users.filter(function (u) {
         return u.id !== user.id;
       });
-    });
-    this.scrollEvent();
-    Echo["private"]('lobby').listen('Ready', function (e) {
-      console.log(e.user);
+    }); // this.scrollEvent();
 
+    Echo["private"]('lobby').listen('Ready', function (e) {
       _this.ready.push(e.user);
+    }).listen('Unready', function (e) {
+      _this.ready = _this.ready.filter(function (u) {
+        return u.id !== e.user.id;
+      });
     });
   },
   methods: {
@@ -1955,23 +1958,36 @@ Vue.use(VueScrollTo);
       elem.click();
     },
     doReady: function doReady() {
+      var _this2 = this;
+
       var user = this.logged_user;
 
       if (!(this.ready.indexOf(user) > -1)) {
-        axios.get("/ready/".concat(this.logged_user.id)).then(function (response) {})["catch"](function (error) {
+        axios.get("/ready/".concat(user.id)).then(function (response) {
+          _this2.ready.push(user);
+        })["catch"](function (error) {
           return console.log(error.response.data);
         });
-        this.ready.push(this.logged_user);
       } else {
         alert("You're Ready!");
       }
     },
     doUnready: function doUnready() {
-      var _this2 = this;
+      var _this3 = this;
 
-      this.ready = this.ready.filter(function (u) {
-        return u.id !== _this2.logged_user.id;
-      });
+      var user = this.logged_user;
+
+      if (!(this.ready.indexOf(user) < -1)) {
+        axios.get("/unready/".concat(user.id)).then(function (response) {
+          _this3.ready = _this3.ready.filter(function (u) {
+            return u.id !== user.id;
+          });
+        })["catch"](function (error) {
+          return console.log(error.response.data);
+        });
+      } else {
+        alert("You're Ready!");
+      }
     }
   }
 });
@@ -47478,7 +47494,7 @@ var render = function() {
               _c(
                 "button",
                 {
-                  staticClass: "btn btn-primary float-right",
+                  staticClass: "btn btn-primary",
                   on: {
                     click: function($event) {
                       return _vm.doUnready()
@@ -60322,7 +60338,7 @@ if (token) {
 window.Pusher = __webpack_require__(/*! pusher-js */ "./node_modules/pusher-js/dist/web/pusher.js");
 window.Echo = new laravel_echo__WEBPACK_IMPORTED_MODULE_0__["default"]({
   broadcaster: 'pusher',
-  key: "5cae8d5a3c198a117d3b",
+  key: "5f0f3de930969bb51d71",
   cluster: "ap2",
   encrypted: true
 });
@@ -60485,8 +60501,8 @@ __webpack_require__.r(__webpack_exports__);
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! D:\laragon\www\quizengine\resources\js\app.js */"./resources/js/app.js");
-module.exports = __webpack_require__(/*! D:\laragon\www\quizengine\resources\sass\app.scss */"./resources/sass/app.scss");
+__webpack_require__(/*! /Users/ayushlikhar/code/dream/quizengine/resources/js/app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! /Users/ayushlikhar/code/dream/quizengine/resources/sass/app.scss */"./resources/sass/app.scss");
 
 
 /***/ })
