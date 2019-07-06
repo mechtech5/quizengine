@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Quiz;
+use App\Models\Topic;
 use Illuminate\Http\Request;
 
-class QuizController extends Controller
+class TopicController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -41,10 +41,10 @@ class QuizController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Quiz  $quiz
+     * @param  \App\Models\Topic  $topic
      * @return \Illuminate\Http\Response
      */
-    public function show(Quiz $quiz)
+    public function show(Topic $topic)
     {
         //
     }
@@ -52,10 +52,10 @@ class QuizController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Quiz  $quiz
+     * @param  \App\Models\Topic  $topic
      * @return \Illuminate\Http\Response
      */
-    public function edit(Quiz $quiz)
+    public function edit(Topic $topic)
     {
         //
     }
@@ -64,10 +64,10 @@ class QuizController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Quiz  $quiz
+     * @param  \App\Models\Topic  $topic
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Quiz $quiz)
+    public function update(Request $request, Topic $topic)
     {
         //
     }
@@ -75,10 +75,10 @@ class QuizController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Quiz  $quiz
+     * @param  \App\Models\Topic  $topic
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Quiz $quiz)
+    public function destroy(Topic $topic)
     {
         //
     }

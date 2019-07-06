@@ -15,11 +15,12 @@ class CreateRoundsTable extends Migration
     {
         Schema::create('rounds', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->unsignedInteger('player_1');
-            $table->unsignedInteger('player_2');
-            $table->decimal('score_1', 6, 2);
-            $table->decimal('score_2', 6, 2);
-            $table->unsignedInteger('winner');
+            $table->unsignedInteger('topic_id');
+            $table->unsignedInteger('player_1')->nullable();
+            $table->unsignedInteger('score_1')->nullable();
+            $table->unsignedInteger('player_2')->nullable();
+            $table->unsignedInteger('score_2')->nullable();
+            $table->unsignedInteger('winner')->nullable();
             $table->timestamps();
         });
     }

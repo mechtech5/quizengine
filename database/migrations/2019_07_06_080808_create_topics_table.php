@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateLobbiesTable extends Migration
+class CreateTopicsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,10 @@ class CreateLobbiesTable extends Migration
      */
     public function up()
     {
-        Schema::create('lobbies', function (Blueprint $table) {
+        Schema::create('topics', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->unsignedInteger('player_id');
+            $table->string('title');
+            $table->text('desc')->nullable();
             $table->timestamps();
         });
     }
@@ -27,6 +28,6 @@ class CreateLobbiesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('lobbies');
+        Schema::dropIfExists('topics');
     }
 }
