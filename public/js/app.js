@@ -1844,12 +1844,59 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
-  props: [],
+  props: ['you', 'round', 'is_initiator'],
   data: function data() {
-    return {};
+    return {
+      timer: 10,
+      questions: [],
+      game: {},
+      player_1: {},
+      player_2: {}
+    };
   },
-  methods: {}
+  mounted: function mounted() {
+    this.game = this.round;
+    this.setPlayer();
+  },
+  methods: {
+    ask: function ask() {},
+    check: function check() {},
+    // Utils
+    getQuestions: function getQuestions(topic_id) {
+      var _this = this;
+
+      axios.get("/api/questions/".concat(topic_id)).then(function (response) {
+        _this.questions = response.data;
+      })["catch"](function (error) {
+        return console.log(error.response.data);
+      });
+    },
+    setPlayer: function setPlayer() {
+      if (this.is_initiator) {
+        this.player_1 = this.you;
+      } else {
+        this.player_2 = this.you;
+      }
+    } // getPlayerDetails(id) {
+    // 	axios.get(`/api/users/${id}`).then(response => {
+    // 		this.player_1 = response.data
+    // 	}).catch(error => console.log(error.response.data));
+    // }
+
+  }
 });
 
 /***/ }),
@@ -1913,6 +1960,19 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 var VueScrollTo = __webpack_require__(/*! vue-scrollto */ "./node_modules/vue-scrollto/vue-scrollto.js");
@@ -1925,68 +1985,87 @@ Vue.use(VueScrollTo);
   },
   data: function data() {
     return {
-      // userStatus: 'Unready',
-      users: [],
-      ready: [],
-      in_game: []
+      me: this.logged_user,
+      game: {},
+      input_code: '',
+      waiting: false,
+      starting: false,
+      is_initiator: false,
+      launch_game: false
     };
   },
-  mounted: function mounted() {
-    var _this = this;
-
-    Echo.join('PlayersOnline').here(function (users) {
-      _this.users = users;
-    }).joining(function (user) {
-      _this.users.push(user);
-    }).leaving(function (user) {
-      _this.users = _this.users.filter(function (u) {
-        return u.id !== user.id;
-      });
-    }); // this.scrollEvent();
-
-    Echo["private"]('lobby').listen('Ready', function (e) {
-      _this.ready.push(e.user);
-    }).listen('Unready', function (e) {
-      _this.ready = _this.ready.filter(function (u) {
-        return u.id !== e.user.id;
-      });
-    });
+  created: function created() {// Echo.join('PlayersOnline').here((users) => {
+    //     this.users = users;
+    //   }).joining((user) => {
+    //     this.users.push(user);
+    //   }).leaving((user) => {
+    //     this.users = this.users.filter(u => (u.id !== user.id))
+    //   });
+    // this.scrollEvent();
+    // Echo.private('lobby')
+    //   .listen('Ready', (e) => {
+    //     this.ready.push(e.user);
+    //   })
+    //   .listen('Unready', (e) => {
+    //     this.ready = this.ready.filter(u => (u.id !== e.user.id))
+    //   });        
   },
   methods: {
-    scrollEvent: function scrollEvent($event) {
-      var elem = this.$refs.scrollBtn;
-      elem.click();
+    // scrollEvent($event) {
+    //   const elem = this.$refs.scrollBtn;
+    //   elem.click();
+    // },
+    // doReady() {
+    //   let user = this.logged_user;
+    //   if(!(this.ready.indexOf(user) > -1)) {
+    //     axios.get(`/ready/${user.id}`).then(response => {
+    //       this.ready.push(user);
+    //     }).catch(error => console.log(error.response.data));
+    //   } else {
+    //     alert("You're Ready!");
+    //   }
+    // },
+    // doUnready() {
+    //   let user = this.logged_user;
+    //   if(!(this.ready.indexOf(user) < -1)) {
+    //     axios.get(`/unready/${user.id}`).then(response => {
+    //       this.ready = this.ready.filter(u => (u.id !== user.id))
+    //     }).catch(error => console.log(error.response.data));
+    //   } else {
+    //     alert("You're Ready!");
+    //   }
+    // },
+    create: function create() {
+      var _this = this;
+
+      var user_id = this.logged_user.id;
+      axios.post("/api/rounds/create/".concat(user_id), {}).then(function (response) {
+        console.log(response.data);
+        _this.game = response.data;
+        alert('Share this code ' + _this.game.code + ' with your friend');
+        _this.is_initiator = _this.waiting = true;
+      })["catch"](function (error) {
+        return console.log(error.response.data);
+      });
     },
-    doReady: function doReady() {
+    join: function join() {
       var _this2 = this;
 
-      var user = this.logged_user;
+      var input_code = this.input_code;
+      var user_id = this.logged_user.id;
 
-      if (!(this.ready.indexOf(user) > -1)) {
-        axios.get("/ready/".concat(user.id)).then(function (response) {
-          _this2.ready.push(user);
+      if (input_code.length === 6) {
+        axios.post("/api/rounds/join/".concat(user_id), {
+          code: input_code
+        }).then(function (response) {
+          console.log(response.data);
+          _this2.game = response.data;
+          _this2.launch_game = _this2.starting = true;
         })["catch"](function (error) {
           return console.log(error.response.data);
         });
       } else {
-        alert("You're Ready!");
-      }
-    },
-    doUnready: function doUnready() {
-      var _this3 = this;
-
-      var user = this.logged_user;
-
-      if (!(this.ready.indexOf(user) < -1)) {
-        axios.get("/unready/".concat(user.id)).then(function (response) {
-          _this3.ready = _this3.ready.filter(function (u) {
-            return u.id !== user.id;
-          });
-        })["catch"](function (error) {
-          return console.log(error.response.data);
-        });
-      } else {
-        alert("You're Ready!");
+        alert('Invalid Code!');
       }
     }
   }
@@ -47432,7 +47511,40 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div")
+  return _c("div", { staticClass: "row" }, [
+    _c("div", { staticClass: "col-3" }, [
+      _c("p", { domProps: { textContent: _vm._s(_vm.player_1.name) } }),
+      _vm._v(" "),
+      _c("p", { domProps: { textContent: _vm._s(_vm.game.score_1) } })
+    ]),
+    _vm._v(" "),
+    _c(
+      "div",
+      { staticClass: "col-6" },
+      [
+        _c("p", { domProps: { textContent: _vm._s(_vm.game.question) } }),
+        _vm._v(" "),
+        _vm._l(_vm.game.options, function(value, name) {
+          return _c("button", {
+            staticClass: "btn",
+            domProps: { textContent: _vm._s(value) },
+            on: {
+              click: function($event) {
+                return _vm.check(name)
+              }
+            }
+          })
+        })
+      ],
+      2
+    ),
+    _vm._v(" "),
+    _c("div", { staticClass: "col-3 text-right" }, [
+      _c("p", { domProps: { textContent: _vm._s(_vm.player_2.name) } }),
+      _vm._v(" "),
+      _c("p", { domProps: { textContent: _vm._s(_vm.game.score_2) } })
+    ])
+  ])
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -47478,107 +47590,98 @@ var render = function() {
             }),
             _vm._v(" "),
             _c("div", { staticClass: "col-md-8" }, [
-              _c(
-                "button",
-                {
-                  staticClass: "btn btn-primary",
-                  on: {
-                    click: function($event) {
-                      return _vm.doReady()
-                    }
-                  }
-                },
-                [_vm._v("Ready")]
-              ),
-              _vm._v(" "),
-              _c(
-                "button",
-                {
-                  staticClass: "btn btn-primary",
-                  on: {
-                    click: function($event) {
-                      return _vm.doUnready()
-                    }
-                  }
-                },
-                [_vm._v("Unready")]
-              ),
-              _vm._v(" "),
-              _c("div", { staticClass: "card" }, [
-                _c("div", { staticClass: "card-header" }, [
-                  _vm._v("Players online")
-                ]),
-                _vm._v(" "),
+              _c("div", { staticClass: "text-center" }, [
                 _c(
-                  "div",
-                  { staticClass: "card-body" },
-                  _vm._l(_vm.users, function(user) {
-                    return _c("a", {
-                      staticClass: "badge badge-primary",
-                      attrs: { href: "#" },
-                      domProps: { textContent: _vm._s(user.name) }
-                    })
-                  }),
-                  0
+                  "button",
+                  {
+                    staticClass: "btn btn-outline-secondary",
+                    on: {
+                      click: function($event) {
+                        return _vm.create()
+                      }
+                    }
+                  },
+                  [_vm._v("Create")]
                 )
               ]),
               _vm._v(" "),
-              _c("hr"),
+              _c("br"),
               _vm._v(" "),
-              _c("div", { staticClass: "card" }, [
-                _c("div", { staticClass: "card-header" }, [
-                  _vm._v("Players ready")
-                ]),
+              _c("p", { staticClass: "text-center" }, [_vm._v("OR")]),
+              _vm._v(" "),
+              _c("div", { staticClass: "input-group mb-3" }, [
+                _c("input", {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.input_code,
+                      expression: "input_code"
+                    }
+                  ],
+                  staticClass: "form-control",
+                  attrs: { type: "text", placeholder: "Enter the code" },
+                  domProps: { value: _vm.input_code },
+                  on: {
+                    input: function($event) {
+                      if ($event.target.composing) {
+                        return
+                      }
+                      _vm.input_code = $event.target.value
+                    }
+                  }
+                }),
                 _vm._v(" "),
-                _c(
-                  "div",
-                  { staticClass: "card-body" },
-                  _vm._l(_vm.ready, function(user) {
-                    return _c("a", {
-                      staticClass: "badge badge-primary",
-                      attrs: { href: "#" },
-                      domProps: { textContent: _vm._s(user.name) }
-                    })
-                  }),
-                  0
-                )
-              ]),
-              _vm._v(" "),
-              _c("hr"),
-              _vm._v(" "),
-              _c("div", { staticClass: "card" }, [
-                _c("div", { staticClass: "card-header" }, [
-                  _vm._v("Players in-game")
-                ]),
-                _vm._v(" "),
-                _c(
-                  "div",
-                  { staticClass: "card-body" },
-                  _vm._l(_vm.in_game, function(user) {
-                    return _c("a", {
-                      staticClass: "badge badge-primary",
-                      attrs: { href: "#" },
-                      domProps: { textContent: _vm._s(user.name) }
-                    })
-                  }),
-                  0
-                )
+                _c("div", { staticClass: "input-group-append" }, [
+                  _c(
+                    "button",
+                    {
+                      staticClass: "btn btn-outline-secondary",
+                      attrs: { type: "button" },
+                      on: {
+                        click: function($event) {
+                          return _vm.join()
+                        }
+                      }
+                    },
+                    [_vm._v("\n                Join")]
+                  )
+                ])
               ])
-            ]),
-            _vm._v(" "),
-            _c("div", { staticStyle: { height: "500px" } })
+            ])
           ])
         ])
       ])
     ]),
     _vm._v(" "),
-    _c("div", { staticClass: "card" }, [
-      _c("div", { staticClass: "card-header" }, [_vm._v("Game")]),
-      _vm._v(" "),
-      _c("div", { staticClass: "card-body" }, [
-        _c("span", { attrs: { id: "game" } }, [_c("game-component")], 1)
-      ])
-    ])
+    _vm.waiting || _vm.starting
+      ? _c("div", { staticClass: "card" }, [
+          _c("div", { staticClass: "card-header" }, [
+            _vm._v("Game\n    "),
+            _c("span", { staticClass: "float-right" }, [
+              _vm._v(_vm._s(this.game.code))
+            ])
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "card-body" }, [
+            _vm.launch_game
+              ? _c(
+                  "div",
+                  [
+                    _c("game-component", {
+                      attrs: {
+                        you: _vm.me,
+                        is_initiator: _vm.is_initiator,
+                        round: _vm.game
+                      }
+                    })
+                  ],
+                  1
+                )
+              : _vm._e()
+          ])
+        ])
+      : _vm._e()
   ])
 }
 var staticRenderFns = []
@@ -60277,7 +60380,15 @@ Vue.component('lobby-component', __webpack_require__(/*! ./components/LobbyCompo
  */
 
 var app = new Vue({
-  el: '#app'
+  el: '#app',
+  mounted: function mounted() {
+    var _this = this;
+
+    Echo.channel('game').listen('FriendIsHere', function (e) {
+      alert(e.user.name);
+      _this.starting = _this.launch_game = true;
+    });
+  }
 });
 
 /***/ }),

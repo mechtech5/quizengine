@@ -22,3 +22,7 @@ Broadcast::channel('PlayersOnline', function ($user) {
 Broadcast::channel('lobby', function ($user) {
   return $user;
 });
+
+Broadcast::channel('game', function ($user) {
+  return $user;
+});

@@ -8,11 +8,11 @@ class QuestionController extends Controller
 {
   public function index() {
   	$questions = Question::all();
-  	return view('question.index', compact('questions'));
+  	return view('questions.index', compact('questions'));
   }
 
   public function create() {
-  	return view('question.create');
+  	return view('questions.create');
   }
 
   public function store()

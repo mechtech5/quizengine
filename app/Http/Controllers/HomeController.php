@@ -14,10 +14,10 @@ class HomeController extends Controller
      *
      * @return void
      */
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
+    // public function __construct()
+    // {
+    //     $this->middleware('auth');
+    // }
 
     /**
      * Show the application dashboard.
@@ -37,5 +37,11 @@ class HomeController extends Controller
     public function unready(User $user)
     {
       broadcast(new Unready($user))->toOthers();
+    }
+
+    public function getPlayerDetails(User $user)
+    {
+        $req = request('req');
+        return $user->name;
     }
 }

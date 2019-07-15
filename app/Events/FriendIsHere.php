@@ -7,11 +7,12 @@ use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Broadcasting\PrivateChannel;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class Unready implements ShouldBroadcastNow
+class FriendIsHere implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -34,6 +35,6 @@ class Unready implements ShouldBroadcastNow
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('lobby', $this->user);
+        return new Channel('game');
     }
 }
