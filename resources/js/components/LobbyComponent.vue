@@ -53,7 +53,7 @@
       <span class="float-right">{{ this.game.code }}</span></div>
       <div class="card-body">
         <div v-if="launch_game">
-          <game-component :you="me" :is_initiator="is_initiator" :round="game"></game-component>
+          <game-component :you="me" :opponent="opponent" :is_initiator="is_initiator" :round="game"></game-component>
         </div>
       </div>
     </div>
@@ -71,6 +71,7 @@
     data() {
       return {
         me: this.logged_user,
+        opponent: {},
         game: {},
         input_code: '',
         waiting: false,
@@ -79,8 +80,16 @@
         launch_game: false
       }
     },
-    created() {
-      
+    mounted() {
+      Echo.channel('game')
+        .listen('FriendIsHere', (e) => {
+          let id = this.game.id;
+          axios.get(`/api/rounds/${id}`).then(response => {
+            this.game = response.data;
+          })
+          this.opponent = e.user;
+          this.starting = this.launch_game = true;
+      });
       // Echo.join('PlayersOnline').here((users) => {
       //     this.users = users;
       //   }).joining((user) => {
@@ -140,6 +149,9 @@
           axios.post(`/api/rounds/join/${user_id}`, {code: input_code}).then(response => {
             console.log(response.data);
             this.game = response.data;
+            axios.get(`/api/users/${response.data.player_1}`).then(response => {
+              this.opponent = response.data;
+            })
             this.launch_game = this.starting = true;
           }).catch(error => console.log(error.response.data));
         } else {

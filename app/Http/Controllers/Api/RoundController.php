@@ -47,4 +47,8 @@ class RoundController extends Controller
       return 'Not Found';
     }
   }
+
+  public function show(Round $round) {
+    return response()->json($round, 200);
+  }
 }

@@ -1,0 +1,2 @@
+Make a single component for now out of the current 2 
+Bring questions when both players ready and start the play.

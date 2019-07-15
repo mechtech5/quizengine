@@ -28,12 +28,5 @@ Vue.component('lobby-component', require('./components/LobbyComponent.vue').defa
  */
 
 const app = new Vue({
-    el: '#app',
-    mounted() {
-    	Echo.channel('game')
-        .listen('FriendIsHere', (e) => {
-          alert(e.user.name);
-          this.starting = this.launch_game = true;
-      });
-    }
+    el: '#app'
 });

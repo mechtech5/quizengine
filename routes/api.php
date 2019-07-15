@@ -11,4 +11,5 @@ Route::get('questions/{question}', 'Api\QuestionController@show');
 
 Route::post('rounds/create/{user}', 'Api\RoundController@create');
 Route::post('rounds/join/{user}', 'Api\RoundController@join');
+Route::get('rounds/{round}', 'Api\RoundController@show');
 Route::get('users/{user}', 'Api\UsersController@show');

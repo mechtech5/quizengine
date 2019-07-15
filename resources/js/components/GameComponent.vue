@@ -18,7 +18,7 @@
 
 <script>
 	export default {
-		props: ['you', 'round', 'is_initiator'],
+		props: ['you', 'opponent', 'round', 'is_initiator'],
 		data() {
 			return {
 				timer: 10,
@@ -49,15 +49,17 @@
 			setPlayer() {
 				if(this.is_initiator) {
 					this.player_1 = this.you;
+					this.player_2 = this.opponent;
 				} else {
 					this.player_2 = this.you;
+					this.player_1 = this.opponent;
 				} 
+			},
+			getPlayerDetails(id) {
+				axios.get(`/api/users/${id}`).then(response => {
+					this.player_2 = response.data;
+				}).catch(error => console.log(error.response.data));
 			}
-			// getPlayerDetails(id) {
-			// 	axios.get(`/api/users/${id}`).then(response => {
-			// 		this.player_1 = response.data
-			// 	}).catch(error => console.log(error.response.data));
-			// }
 		}
 	}
 </script>

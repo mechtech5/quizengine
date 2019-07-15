@@ -1857,7 +1857,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 /* harmony default export */ __webpack_exports__["default"] = ({
-  props: ['you', 'round', 'is_initiator'],
+  props: ['you', 'opponent', 'round', 'is_initiator'],
   data: function data() {
     return {
       timer: 10,
@@ -1887,15 +1887,21 @@ __webpack_require__.r(__webpack_exports__);
     setPlayer: function setPlayer() {
       if (this.is_initiator) {
         this.player_1 = this.you;
+        this.player_2 = this.opponent;
       } else {
         this.player_2 = this.you;
+        this.player_1 = this.opponent;
       }
-    } // getPlayerDetails(id) {
-    // 	axios.get(`/api/users/${id}`).then(response => {
-    // 		this.player_1 = response.data
-    // 	}).catch(error => console.log(error.response.data));
-    // }
+    },
+    getPlayerDetails: function getPlayerDetails(id) {
+      var _this2 = this;
 
+      axios.get("/api/users/".concat(id)).then(function (response) {
+        _this2.player_2 = response.data;
+      })["catch"](function (error) {
+        return console.log(error.response.data);
+      });
+    }
   }
 });
 
@@ -1986,6 +1992,7 @@ Vue.use(VueScrollTo);
   data: function data() {
     return {
       me: this.logged_user,
+      opponent: {},
       game: {},
       input_code: '',
       waiting: false,
@@ -1994,7 +2001,17 @@ Vue.use(VueScrollTo);
       launch_game: false
     };
   },
-  created: function created() {// Echo.join('PlayersOnline').here((users) => {
+  mounted: function mounted() {
+    var _this = this;
+
+    Echo.channel('game').listen('FriendIsHere', function (e) {
+      var id = _this.game.id;
+      axios.get("/api/rounds/".concat(id)).then(function (response) {
+        _this.game = response.data;
+      });
+      _this.opponent = e.user;
+      _this.starting = _this.launch_game = true;
+    }); // Echo.join('PlayersOnline').here((users) => {
     //     this.users = users;
     //   }).joining((user) => {
     //     this.users.push(user);
@@ -2036,20 +2053,20 @@ Vue.use(VueScrollTo);
     //   }
     // },
     create: function create() {
-      var _this = this;
+      var _this2 = this;
 
       var user_id = this.logged_user.id;
       axios.post("/api/rounds/create/".concat(user_id), {}).then(function (response) {
         console.log(response.data);
-        _this.game = response.data;
-        alert('Share this code ' + _this.game.code + ' with your friend');
-        _this.is_initiator = _this.waiting = true;
+        _this2.game = response.data;
+        alert('Share this code ' + _this2.game.code + ' with your friend');
+        _this2.is_initiator = _this2.waiting = true;
       })["catch"](function (error) {
         return console.log(error.response.data);
       });
     },
     join: function join() {
-      var _this2 = this;
+      var _this3 = this;
 
       var input_code = this.input_code;
       var user_id = this.logged_user.id;
@@ -2059,8 +2076,11 @@ Vue.use(VueScrollTo);
           code: input_code
         }).then(function (response) {
           console.log(response.data);
-          _this2.game = response.data;
-          _this2.launch_game = _this2.starting = true;
+          _this3.game = response.data;
+          axios.get("/api/users/".concat(response.data.player_1)).then(function (response) {
+            _this3.opponent = response.data;
+          });
+          _this3.launch_game = _this3.starting = true;
         })["catch"](function (error) {
           return console.log(error.response.data);
         });
@@ -47671,6 +47691,7 @@ var render = function() {
                     _c("game-component", {
                       attrs: {
                         you: _vm.me,
+                        opponent: _vm.opponent,
                         is_initiator: _vm.is_initiator,
                         round: _vm.game
                       }
@@ -60380,15 +60401,7 @@ Vue.component('lobby-component', __webpack_require__(/*! ./components/LobbyCompo
  */
 
 var app = new Vue({
-  el: '#app',
-  mounted: function mounted() {
-    var _this = this;
-
-    Echo.channel('game').listen('FriendIsHere', function (e) {
-      alert(e.user.name);
-      _this.starting = _this.launch_game = true;
-    });
-  }
+  el: '#app'
 });
 
 /***/ }),
@@ -60449,7 +60462,7 @@ if (token) {
 window.Pusher = __webpack_require__(/*! pusher-js */ "./node_modules/pusher-js/dist/web/pusher.js");
 window.Echo = new laravel_echo__WEBPACK_IMPORTED_MODULE_0__["default"]({
   broadcaster: 'pusher',
-  key: "5f0f3de930969bb51d71",
+  key: "b5eb725e1bd9130f096f",
   cluster: "ap2",
   encrypted: true
 });
