@@ -1856,67 +1856,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-/* harmony default export */ __webpack_exports__["default"] = ({
-  props: ['you', 'opponent', 'round', 'is_initiator'],
-  data: function data() {
-    return {
-      timer: 10,
-      questions: [],
-      game: {},
-      player_1: {},
-      player_2: {}
-    };
-  },
-  mounted: function mounted() {
-    this.game = this.round;
-    this.setPlayer();
-  },
-  methods: {
-    ask: function ask() {},
-    check: function check() {},
-    // Utils
-    getQuestions: function getQuestions(topic_id) {
-      var _this = this;
-
-      axios.get("/api/questions/".concat(topic_id)).then(function (response) {
-        _this.questions = response.data;
-      })["catch"](function (error) {
-        return console.log(error.response.data);
-      });
-    },
-    setPlayer: function setPlayer() {
-      if (this.is_initiator) {
-        this.player_1 = this.you;
-        this.player_2 = this.opponent;
-      } else {
-        this.player_2 = this.you;
-        this.player_1 = this.opponent;
-      }
-    },
-    getPlayerDetails: function getPlayerDetails(id) {
-      var _this2 = this;
-
-      axios.get("/api/users/".concat(id)).then(function (response) {
-        _this2.player_2 = response.data;
-      })["catch"](function (error) {
-        return console.log(error.response.data);
-      });
-    }
-  }
-});
-
-/***/ }),
-
-/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/LobbyComponent.vue?vue&type=script&lang=js&":
-/*!*************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/LobbyComponent.vue?vue&type=script&lang=js& ***!
-  \*************************************************************************************************************************************************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _GameComponent_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./GameComponent.vue */ "./resources/js/components/GameComponent.vue");
 //
 //
 //
@@ -1942,125 +1881,46 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-
-
-var VueScrollTo = __webpack_require__(/*! vue-scrollto */ "./node_modules/vue-scrollto/vue-scrollto.js");
-
-Vue.use(VueScrollTo);
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: ['logged_user'],
-  components: {
-    GameComponent: _GameComponent_vue__WEBPACK_IMPORTED_MODULE_0__["default"]
-  },
   data: function data() {
     return {
-      me: this.logged_user,
-      opponent: {},
-      game: {},
-      input_code: '',
-      waiting: false,
-      starting: false,
+      // Game
+      round: {},
+      started: false,
       is_initiator: false,
-      launch_game: false
+      input_code: '',
+      // Players
+      me: {},
+      opponent: {},
+      // Quiz
+      timer: 10,
+      questions: []
     };
   },
   mounted: function mounted() {
     var _this = this;
 
+    this.me = this.logged_user;
     Echo.channel('game').listen('FriendIsHere', function (e) {
-      var id = _this.game.id;
+      var id = _this.round.id;
       axios.get("/api/rounds/".concat(id)).then(function (response) {
-        _this.game = response.data;
+        _this.round = response.data;
+        console.log('FriendIsHere', response.data);
       });
       _this.opponent = e.user;
-      _this.starting = _this.launch_game = true;
-    }); // Echo.join('PlayersOnline').here((users) => {
-    //     this.users = users;
-    //   }).joining((user) => {
-    //     this.users.push(user);
-    //   }).leaving((user) => {
-    //     this.users = this.users.filter(u => (u.id !== user.id))
-    //   });
-    // this.scrollEvent();
-    // Echo.private('lobby')
-    //   .listen('Ready', (e) => {
-    //     this.ready.push(e.user);
-    //   })
-    //   .listen('Unready', (e) => {
-    //     this.ready = this.ready.filter(u => (u.id !== e.user.id))
-    //   });        
+      _this.started = true;
+    });
   },
   methods: {
-    // scrollEvent($event) {
-    //   const elem = this.$refs.scrollBtn;
-    //   elem.click();
-    // },
-    // doReady() {
-    //   let user = this.logged_user;
-    //   if(!(this.ready.indexOf(user) > -1)) {
-    //     axios.get(`/ready/${user.id}`).then(response => {
-    //       this.ready.push(user);
-    //     }).catch(error => console.log(error.response.data));
-    //   } else {
-    //     alert("You're Ready!");
-    //   }
-    // },
-    // doUnready() {
-    //   let user = this.logged_user;
-    //   if(!(this.ready.indexOf(user) < -1)) {
-    //     axios.get(`/unready/${user.id}`).then(response => {
-    //       this.ready = this.ready.filter(u => (u.id !== user.id))
-    //     }).catch(error => console.log(error.response.data));
-    //   } else {
-    //     alert("You're Ready!");
-    //   }
-    // },
     create: function create() {
       var _this2 = this;
 
-      var user_id = this.logged_user.id;
-      axios.post("/api/rounds/create/".concat(user_id), {}).then(function (response) {
-        console.log(response.data);
-        _this2.game = response.data;
-        alert('Share this code ' + _this2.game.code + ' with your friend');
-        _this2.is_initiator = _this2.waiting = true;
+      axios.post("/api/rounds/create/".concat(this.me.id), {}).then(function (response) {
+        console.log('Create', response.data);
+        _this2.round = response.data;
+        _this2.is_initiator = true;
+        alert('Share this code ' + _this2.round.code + ' with your friend');
       })["catch"](function (error) {
         return console.log(error.response.data);
       });
@@ -2068,25 +1928,43 @@ Vue.use(VueScrollTo);
     join: function join() {
       var _this3 = this;
 
-      var input_code = this.input_code;
-      var user_id = this.logged_user.id;
-
-      if (input_code.length === 6) {
-        axios.post("/api/rounds/join/".concat(user_id), {
-          code: input_code
+      if (this.input_code.length === 6) {
+        axios.post("/api/rounds/join/".concat(this.me.id), {
+          code: this.input_code
         }).then(function (response) {
-          console.log(response.data);
-          _this3.game = response.data;
+          console.log('Join', response.data);
+          _this3.round = response.data;
           axios.get("/api/users/".concat(response.data.player_1)).then(function (response) {
             _this3.opponent = response.data;
           });
-          _this3.launch_game = _this3.starting = true;
+          _this3.started = true;
         })["catch"](function (error) {
           return console.log(error.response.data);
         });
       } else {
         alert('Invalid Code!');
       }
+    },
+    ask: function ask() {},
+    check: function check() {},
+    // Utils
+    getQuestions: function getQuestions(topic_id) {
+      var _this4 = this;
+
+      axios.get("/api/questions/".concat(topic_id)).then(function (response) {
+        _this4.questions = response.data;
+      })["catch"](function (error) {
+        return console.log(error.response.data);
+      });
+    },
+    getPlayerDetails: function getPlayerDetails(id) {
+      var _this5 = this;
+
+      axios.get("/api/users/".concat(id)).then(function (response) {
+        _this5.player_2 = response.data;
+      })["catch"](function (error) {
+        return console.log(error.response.data);
+      });
     }
   }
 });
@@ -47531,178 +47409,124 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "row" }, [
-    _c("div", { staticClass: "col-3" }, [
-      _c("p", { domProps: { textContent: _vm._s(_vm.player_1.name) } }),
-      _vm._v(" "),
-      _c("p", { domProps: { textContent: _vm._s(_vm.game.score_1) } })
+  return _c("div", { staticClass: "card" }, [
+    _c("div", { staticClass: "card-header" }, [
+      _vm._v("QuizEngine\n\t\t"),
+      _c("span", {
+        staticClass: "float-right",
+        domProps: { textContent: _vm._s(this.round.code) }
+      })
     ]),
     _vm._v(" "),
-    _c(
-      "div",
-      { staticClass: "col-6" },
-      [
-        _c("p", { domProps: { textContent: _vm._s(_vm.game.question) } }),
-        _vm._v(" "),
-        _vm._l(_vm.game.options, function(value, name) {
-          return _c("button", {
-            staticClass: "btn",
-            domProps: { textContent: _vm._s(value) },
-            on: {
-              click: function($event) {
-                return _vm.check(name)
-              }
-            }
-          })
-        })
-      ],
-      2
-    ),
-    _vm._v(" "),
-    _c("div", { staticClass: "col-3 text-right" }, [
-      _c("p", { domProps: { textContent: _vm._s(_vm.player_2.name) } }),
-      _vm._v(" "),
-      _c("p", { domProps: { textContent: _vm._s(_vm.game.score_2) } })
-    ])
-  ])
-}
-var staticRenderFns = []
-render._withStripped = true
-
-
-
-/***/ }),
-
-/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/LobbyComponent.vue?vue&type=template&id=24d28172&":
-/*!*****************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/LobbyComponent.vue?vue&type=template&id=24d28172& ***!
-  \*****************************************************************************************************************************************************************************************************************/
-/*! exports provided: render, staticRenderFns */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
-var render = function() {
-  var _vm = this
-  var _h = _vm.$createElement
-  var _c = _vm._self._c || _h
-  return _c("div", [
-    _c("div", { staticClass: "card" }, [
-      _c("div", { staticClass: "card-header" }, [_vm._v("Lobby")]),
-      _vm._v(" "),
-      _c("div", { staticClass: "card-body" }, [
-        _c("div", { staticClass: "container" }, [
-          _c("div", { staticClass: "row justify-content-center" }, [
-            _c("button", {
-              directives: [
-                {
-                  name: "scroll-to",
-                  rawName: "v-scroll-to",
-                  value: { element: "#game", duration: 2000 },
-                  expression: "{ element: '#game', duration: 2000 }"
-                }
-              ],
-              ref: "scrollBtn",
-              staticStyle: { display: "none" },
-              attrs: { type: "button" }
-            }),
-            _vm._v(" "),
-            _c("div", { staticClass: "col-md-8" }, [
-              _c("div", { staticClass: "text-center" }, [
-                _c(
-                  "button",
-                  {
-                    staticClass: "btn btn-outline-secondary",
-                    on: {
-                      click: function($event) {
-                        return _vm.create()
-                      }
-                    }
-                  },
-                  [_vm._v("Create")]
-                )
-              ]),
-              _vm._v(" "),
-              _c("br"),
-              _vm._v(" "),
-              _c("p", { staticClass: "text-center" }, [_vm._v("OR")]),
-              _vm._v(" "),
-              _c("div", { staticClass: "input-group mb-3" }, [
-                _c("input", {
-                  directives: [
-                    {
-                      name: "model",
-                      rawName: "v-model",
-                      value: _vm.input_code,
-                      expression: "input_code"
-                    }
-                  ],
-                  staticClass: "form-control",
-                  attrs: { type: "text", placeholder: "Enter the code" },
-                  domProps: { value: _vm.input_code },
-                  on: {
-                    input: function($event) {
-                      if ($event.target.composing) {
-                        return
-                      }
-                      _vm.input_code = $event.target.value
-                    }
-                  }
-                }),
-                _vm._v(" "),
-                _c("div", { staticClass: "input-group-append" }, [
+    _c("div", { staticClass: "card-body" }, [
+      !_vm.started
+        ? _c("div", { staticClass: "container" }, [
+            _c("div", { staticClass: "row justify-content-center" }, [
+              _c("div", { staticClass: "col-md-8" }, [
+                _c("div", { staticClass: "text-center" }, [
                   _c(
                     "button",
                     {
                       staticClass: "btn btn-outline-secondary",
-                      attrs: { type: "button" },
                       on: {
                         click: function($event) {
-                          return _vm.join()
+                          return _vm.create()
                         }
                       }
                     },
-                    [_vm._v("\n                Join")]
+                    [_vm._v("Create")]
                   )
+                ]),
+                _vm._v(" "),
+                _c("br"),
+                _vm._v(" "),
+                _c("p", { staticClass: "text-center" }, [_vm._v("OR")]),
+                _vm._v(" "),
+                _c("div", { staticClass: "input-group mb-3" }, [
+                  _c("input", {
+                    directives: [
+                      {
+                        name: "model",
+                        rawName: "v-model",
+                        value: _vm.input_code,
+                        expression: "input_code"
+                      }
+                    ],
+                    staticClass: "form-control",
+                    attrs: { type: "text", placeholder: "Enter the code" },
+                    domProps: { value: _vm.input_code },
+                    on: {
+                      input: function($event) {
+                        if ($event.target.composing) {
+                          return
+                        }
+                        _vm.input_code = $event.target.value
+                      }
+                    }
+                  }),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "input-group-append" }, [
+                    _c(
+                      "button",
+                      {
+                        staticClass: "btn btn-outline-secondary",
+                        attrs: { type: "button" },
+                        on: {
+                          click: function($event) {
+                            return _vm.join()
+                          }
+                        }
+                      },
+                      [_vm._v("\n\t\t\t\t          Join")]
+                    )
+                  ])
                 ])
               ])
             ])
           ])
-        ])
-      ])
-    ]),
-    _vm._v(" "),
-    _vm.waiting || _vm.starting
-      ? _c("div", { staticClass: "card" }, [
-          _c("div", { staticClass: "card-header" }, [
-            _vm._v("Game\n    "),
-            _c("span", { staticClass: "float-right" }, [
-              _vm._v(_vm._s(this.game.code))
-            ])
-          ]),
-          _vm._v(" "),
-          _c("div", { staticClass: "card-body" }, [
-            _vm.launch_game
-              ? _c(
-                  "div",
-                  [
-                    _c("game-component", {
-                      attrs: {
-                        you: _vm.me,
-                        opponent: _vm.opponent,
-                        is_initiator: _vm.is_initiator,
-                        round: _vm.game
+        : _vm._e(),
+      _vm._v(" "),
+      _c("hr"),
+      _vm._v(" "),
+      _vm.started
+        ? _c("span", { staticClass: "row" }, [
+            _c("div", { staticClass: "col-3" }, [
+              _c("p", { domProps: { textContent: _vm._s(_vm.me.name) } }),
+              _vm._v(" "),
+              _c("p", { domProps: { textContent: _vm._s(_vm.round.score_1) } })
+            ]),
+            _vm._v(" "),
+            _c(
+              "div",
+              { staticClass: "col-6" },
+              [
+                _c("p", {
+                  domProps: { textContent: _vm._s(_vm.round.question) }
+                }),
+                _vm._v(" "),
+                _vm._l(_vm.round.options, function(value, name) {
+                  return _c("button", {
+                    staticClass: "btn",
+                    domProps: { textContent: _vm._s(value) },
+                    on: {
+                      click: function($event) {
+                        return _vm.check(name)
                       }
-                    })
-                  ],
-                  1
-                )
-              : _vm._e()
+                    }
+                  })
+                })
+              ],
+              2
+            ),
+            _vm._v(" "),
+            _c("div", { staticClass: "col-3 text-right" }, [
+              _c("p", { domProps: { textContent: _vm._s(_vm.opponent.name) } }),
+              _vm._v(" "),
+              _c("p", { domProps: { textContent: _vm._s(_vm.round.score_2) } })
+            ])
           ])
-        ])
-      : _vm._e()
+        : _vm._e()
+    ])
   ])
 }
 var staticRenderFns = []
@@ -47815,526 +47639,6 @@ function normalizeComponent (
     options: options
   }
 }
-
-
-/***/ }),
-
-/***/ "./node_modules/vue-scrollto/vue-scrollto.js":
-/*!***************************************************!*\
-  !*** ./node_modules/vue-scrollto/vue-scrollto.js ***!
-  \***************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-/*!
-  * vue-scrollto v2.15.0
-  * (c) 2019 Randjelovic Igor
-  * @license MIT
-  */
-(function (global, factory) {
-   true ? module.exports = factory() :
-  undefined;
-}(this, function () { 'use strict';
-
-  function _typeof(obj) {
-    if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
-      _typeof = function (obj) {
-        return typeof obj;
-      };
-    } else {
-      _typeof = function (obj) {
-        return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
-      };
-    }
-
-    return _typeof(obj);
-  }
-
-  function _extends() {
-    _extends = Object.assign || function (target) {
-      for (var i = 1; i < arguments.length; i++) {
-        var source = arguments[i];
-
-        for (var key in source) {
-          if (Object.prototype.hasOwnProperty.call(source, key)) {
-            target[key] = source[key];
-          }
-        }
-      }
-
-      return target;
-    };
-
-    return _extends.apply(this, arguments);
-  }
-
-  /**
-   * https://github.com/gre/bezier-easing
-   * BezierEasing - use bezier curve for transition easing function
-   * by Gaëtan Renaudeau 2014 - 2015 – MIT License
-   */
-
-  // These values are established by empiricism with tests (tradeoff: performance VS precision)
-  var NEWTON_ITERATIONS = 4;
-  var NEWTON_MIN_SLOPE = 0.001;
-  var SUBDIVISION_PRECISION = 0.0000001;
-  var SUBDIVISION_MAX_ITERATIONS = 10;
-
-  var kSplineTableSize = 11;
-  var kSampleStepSize = 1.0 / (kSplineTableSize - 1.0);
-
-  var float32ArraySupported = typeof Float32Array === 'function';
-
-  function A (aA1, aA2) { return 1.0 - 3.0 * aA2 + 3.0 * aA1; }
-  function B (aA1, aA2) { return 3.0 * aA2 - 6.0 * aA1; }
-  function C (aA1)      { return 3.0 * aA1; }
-
-  // Returns x(t) given t, x1, and x2, or y(t) given t, y1, and y2.
-  function calcBezier (aT, aA1, aA2) { return ((A(aA1, aA2) * aT + B(aA1, aA2)) * aT + C(aA1)) * aT; }
-
-  // Returns dx/dt given t, x1, and x2, or dy/dt given t, y1, and y2.
-  function getSlope (aT, aA1, aA2) { return 3.0 * A(aA1, aA2) * aT * aT + 2.0 * B(aA1, aA2) * aT + C(aA1); }
-
-  function binarySubdivide (aX, aA, aB, mX1, mX2) {
-    var currentX, currentT, i = 0;
-    do {
-      currentT = aA + (aB - aA) / 2.0;
-      currentX = calcBezier(currentT, mX1, mX2) - aX;
-      if (currentX > 0.0) {
-        aB = currentT;
-      } else {
-        aA = currentT;
-      }
-    } while (Math.abs(currentX) > SUBDIVISION_PRECISION && ++i < SUBDIVISION_MAX_ITERATIONS);
-    return currentT;
-  }
-
-  function newtonRaphsonIterate (aX, aGuessT, mX1, mX2) {
-   for (var i = 0; i < NEWTON_ITERATIONS; ++i) {
-     var currentSlope = getSlope(aGuessT, mX1, mX2);
-     if (currentSlope === 0.0) {
-       return aGuessT;
-     }
-     var currentX = calcBezier(aGuessT, mX1, mX2) - aX;
-     aGuessT -= currentX / currentSlope;
-   }
-   return aGuessT;
-  }
-
-  function LinearEasing (x) {
-    return x;
-  }
-
-  var src = function bezier (mX1, mY1, mX2, mY2) {
-    if (!(0 <= mX1 && mX1 <= 1 && 0 <= mX2 && mX2 <= 1)) {
-      throw new Error('bezier x values must be in [0, 1] range');
-    }
-
-    if (mX1 === mY1 && mX2 === mY2) {
-      return LinearEasing;
-    }
-
-    // Precompute samples table
-    var sampleValues = float32ArraySupported ? new Float32Array(kSplineTableSize) : new Array(kSplineTableSize);
-    for (var i = 0; i < kSplineTableSize; ++i) {
-      sampleValues[i] = calcBezier(i * kSampleStepSize, mX1, mX2);
-    }
-
-    function getTForX (aX) {
-      var intervalStart = 0.0;
-      var currentSample = 1;
-      var lastSample = kSplineTableSize - 1;
-
-      for (; currentSample !== lastSample && sampleValues[currentSample] <= aX; ++currentSample) {
-        intervalStart += kSampleStepSize;
-      }
-      --currentSample;
-
-      // Interpolate to provide an initial guess for t
-      var dist = (aX - sampleValues[currentSample]) / (sampleValues[currentSample + 1] - sampleValues[currentSample]);
-      var guessForT = intervalStart + dist * kSampleStepSize;
-
-      var initialSlope = getSlope(guessForT, mX1, mX2);
-      if (initialSlope >= NEWTON_MIN_SLOPE) {
-        return newtonRaphsonIterate(aX, guessForT, mX1, mX2);
-      } else if (initialSlope === 0.0) {
-        return guessForT;
-      } else {
-        return binarySubdivide(aX, intervalStart, intervalStart + kSampleStepSize, mX1, mX2);
-      }
-    }
-
-    return function BezierEasing (x) {
-      // Because JavaScript number are imprecise, we should guarantee the extremes are right.
-      if (x === 0) {
-        return 0;
-      }
-      if (x === 1) {
-        return 1;
-      }
-      return calcBezier(getTForX(x), mY1, mY2);
-    };
-  };
-
-  var easings = {
-    ease: [0.25, 0.1, 0.25, 1.0],
-    linear: [0.00, 0.0, 1.00, 1.0],
-    "ease-in": [0.42, 0.0, 1.00, 1.0],
-    "ease-out": [0.00, 0.0, 0.58, 1.0],
-    "ease-in-out": [0.42, 0.0, 0.58, 1.0]
-  };
-
-  // https://github.com/WICG/EventListenerOptions/blob/gh-pages/explainer.md#feature-detection
-  var supportsPassive = false;
-
-  try {
-    var opts = Object.defineProperty({}, "passive", {
-      get: function get() {
-        supportsPassive = true;
-      }
-    });
-    window.addEventListener("test", null, opts);
-  } catch (e) {}
-
-  var _ = {
-    $: function $(selector) {
-      if (typeof selector !== "string") {
-        return selector;
-      }
-
-      return document.querySelector(selector);
-    },
-    on: function on(element, events, handler) {
-      var opts = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {
-        passive: false
-      };
-
-      if (!(events instanceof Array)) {
-        events = [events];
-      }
-
-      for (var i = 0; i < events.length; i++) {
-        element.addEventListener(events[i], handler, supportsPassive ? opts : false);
-      }
-    },
-    off: function off(element, events, handler) {
-      if (!(events instanceof Array)) {
-        events = [events];
-      }
-
-      for (var i = 0; i < events.length; i++) {
-        element.removeEventListener(events[i], handler);
-      }
-    },
-    cumulativeOffset: function cumulativeOffset(element) {
-      var top = 0;
-      var left = 0;
-
-      do {
-        top += element.offsetTop || 0;
-        left += element.offsetLeft || 0;
-        element = element.offsetParent;
-      } while (element);
-
-      return {
-        top: top,
-        left: left
-      };
-    }
-  };
-
-  var abortEvents = ["mousedown", "wheel", "DOMMouseScroll", "mousewheel", "keyup", "touchmove"];
-  var defaults = {
-    container: "body",
-    duration: 500,
-    easing: "ease",
-    offset: 0,
-    force: true,
-    cancelable: true,
-    onStart: false,
-    onDone: false,
-    onCancel: false,
-    x: false,
-    y: true
-  };
-  function setDefaults(options) {
-    defaults = _extends({}, defaults, options);
-  }
-  var scroller = function scroller() {
-    var element; // element to scroll to
-
-    var container; // container to scroll
-
-    var duration; // duration of the scrolling
-
-    var easing; // easing to be used when scrolling
-
-    var offset; // offset to be added (subtracted)
-
-    var force; // force scroll, even if element is visible
-
-    var cancelable; // indicates if user can cancel the scroll or not.
-
-    var onStart; // callback when scrolling is started
-
-    var onDone; // callback when scrolling is done
-
-    var onCancel; // callback when scrolling is canceled / aborted
-
-    var x; // scroll on x axis
-
-    var y; // scroll on y axis
-
-    var initialX; // initial X of container
-
-    var targetX; // target X of container
-
-    var initialY; // initial Y of container
-
-    var targetY; // target Y of container
-
-    var diffX; // difference
-
-    var diffY; // difference
-
-    var abort; // is scrolling aborted
-
-    var abortEv; // event that aborted scrolling
-
-    var abortFn = function abortFn(e) {
-      if (!cancelable) return;
-      abortEv = e;
-      abort = true;
-    };
-
-    var easingFn;
-    var timeStart; // time when scrolling started
-
-    var timeElapsed; // time elapsed since scrolling started
-
-    var progress; // progress
-
-    function scrollTop(container) {
-      var scrollTop = container.scrollTop;
-
-      if (container.tagName.toLowerCase() === "body") {
-        // in firefox body.scrollTop always returns 0
-        // thus if we are trying to get scrollTop on a body tag
-        // we need to get it from the documentElement
-        scrollTop = scrollTop || document.documentElement.scrollTop;
-      }
-
-      return scrollTop;
-    }
-
-    function scrollLeft(container) {
-      var scrollLeft = container.scrollLeft;
-
-      if (container.tagName.toLowerCase() === "body") {
-        // in firefox body.scrollLeft always returns 0
-        // thus if we are trying to get scrollLeft on a body tag
-        // we need to get it from the documentElement
-        scrollLeft = scrollLeft || document.documentElement.scrollLeft;
-      }
-
-      return scrollLeft;
-    }
-
-    function step(timestamp) {
-      if (abort) return done();
-      if (!timeStart) timeStart = timestamp;
-      timeElapsed = timestamp - timeStart;
-      progress = Math.min(timeElapsed / duration, 1);
-      progress = easingFn(progress);
-      topLeft(container, initialY + diffY * progress, initialX + diffX * progress);
-      timeElapsed < duration ? window.requestAnimationFrame(step) : done();
-    }
-
-    function done() {
-      if (!abort) topLeft(container, targetY, targetX);
-      timeStart = false;
-
-      _.off(container, abortEvents, abortFn);
-
-      if (abort && onCancel) onCancel(abortEv, element);
-      if (!abort && onDone) onDone(element);
-    }
-
-    function topLeft(element, top, left) {
-      if (y) element.scrollTop = top;
-      if (x) element.scrollLeft = left;
-
-      if (element.tagName.toLowerCase() === "body") {
-        // in firefox body.scrollTop doesn't scroll the page
-        // thus if we are trying to scrollTop on a body tag
-        // we need to scroll on the documentElement
-        if (y) document.documentElement.scrollTop = top;
-        if (x) document.documentElement.scrollLeft = left;
-      }
-    }
-
-    function scrollTo(target, _duration) {
-      var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-
-      if (_typeof(_duration) === "object") {
-        options = _duration;
-      } else if (typeof _duration === "number") {
-        options.duration = _duration;
-      }
-
-      element = _.$(target);
-
-      if (!element) {
-        return console.warn("[vue-scrollto warn]: Trying to scroll to an element that is not on the page: " + target);
-      }
-
-      container = _.$(options.container || defaults.container);
-      duration = options.duration || defaults.duration;
-      easing = options.easing || defaults.easing;
-      offset = options.offset || defaults.offset;
-      force = options.hasOwnProperty("force") ? options.force !== false : defaults.force;
-      cancelable = options.hasOwnProperty("cancelable") ? options.cancelable !== false : defaults.cancelable;
-      onStart = options.onStart || defaults.onStart;
-      onDone = options.onDone || defaults.onDone;
-      onCancel = options.onCancel || defaults.onCancel;
-      x = options.x === undefined ? defaults.x : options.x;
-      y = options.y === undefined ? defaults.y : options.y;
-
-      var cumulativeOffsetContainer = _.cumulativeOffset(container);
-
-      var cumulativeOffsetElement = _.cumulativeOffset(element);
-
-      if (typeof offset === "function") {
-        offset = offset();
-      }
-
-      initialY = scrollTop(container);
-      targetY = cumulativeOffsetElement.top - cumulativeOffsetContainer.top + offset;
-      initialX = scrollLeft(container);
-      targetX = cumulativeOffsetElement.left - cumulativeOffsetContainer.left + offset;
-      abort = false;
-      diffY = targetY - initialY;
-      diffX = targetX - initialX;
-
-      if (!force) {
-        var containerTop = initialY;
-        var containerBottom = containerTop + container.offsetHeight;
-        var elementTop = targetY;
-        var elementBottom = elementTop + element.offsetHeight;
-
-        if (elementTop >= containerTop && elementBottom <= containerBottom) {
-          // make sure to call the onDone callback even if there is no need to
-          // scroll the container. Fixes #111 (ref #118)
-          onDone(element);
-          return;
-        }
-      }
-
-      if (typeof easing === "string") {
-        easing = easings[easing] || easings["ease"];
-      }
-
-      easingFn = src.apply(src, easing);
-      if (!diffY && !diffX) return;
-      if (onStart) onStart(element);
-
-      _.on(container, abortEvents, abortFn, {
-        passive: true
-      });
-
-      window.requestAnimationFrame(step);
-      return function () {
-        abortEv = null;
-        abort = true;
-      };
-    }
-
-    return scrollTo;
-  };
-
-  var _scroller = scroller();
-
-  var bindings = []; // store binding data
-
-  function deleteBinding(el) {
-    for (var i = 0; i < bindings.length; ++i) {
-      if (bindings[i].el === el) {
-        bindings.splice(i, 1);
-        return true;
-      }
-    }
-
-    return false;
-  }
-
-  function findBinding(el) {
-    for (var i = 0; i < bindings.length; ++i) {
-      if (bindings[i].el === el) {
-        return bindings[i];
-      }
-    }
-  }
-
-  function getBinding(el) {
-    var binding = findBinding(el);
-
-    if (binding) {
-      return binding;
-    }
-
-    bindings.push(binding = {
-      el: el,
-      binding: {}
-    });
-    return binding;
-  }
-
-  function handleClick(e) {
-    e.preventDefault();
-    var ctx = getBinding(this).binding;
-
-    if (typeof ctx.value === "string") {
-      return _scroller(ctx.value);
-    }
-
-    _scroller(ctx.value.el || ctx.value.element, ctx.value);
-  }
-
-  var VueScrollTo = {
-    bind: function bind(el, binding) {
-      getBinding(el).binding = binding;
-
-      _.on(el, "click", handleClick);
-    },
-    unbind: function unbind(el) {
-      deleteBinding(el);
-
-      _.off(el, "click", handleClick);
-    },
-    update: function update(el, binding) {
-      getBinding(el).binding = binding;
-    },
-    scrollTo: _scroller,
-    bindings: bindings
-  };
-
-  var install = function install(Vue, options) {
-    if (options) setDefaults(options);
-    Vue.directive("scroll-to", VueScrollTo);
-    Vue.prototype.$scrollTo = VueScrollTo.scrollTo;
-  };
-
-  if (typeof window !== "undefined" && window.Vue) {
-    window.VueScrollTo = VueScrollTo;
-    window.VueScrollTo.setDefaults = setDefaults;
-    window.Vue.use(install);
-  }
-
-  VueScrollTo.install = install;
-
-  return VueScrollTo;
-
-}));
 
 
 /***/ }),
@@ -60393,7 +59697,7 @@ window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.
 // const files = require.context('./', true, /\.vue$/i);
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default));
 
-Vue.component('lobby-component', __webpack_require__(/*! ./components/LobbyComponent.vue */ "./resources/js/components/LobbyComponent.vue")["default"]);
+Vue.component('game-component', __webpack_require__(/*! ./components/GameComponent.vue */ "./resources/js/components/GameComponent.vue")["default"]);
 /**
  * Next, we will create a fresh Vue application instance and attach it to
  * the page. Then, you may begin adding components to this application
@@ -60533,75 +59837,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_GameComponent_vue_vue_type_template_id_5cec6160___WEBPACK_IMPORTED_MODULE_0__["render"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_GameComponent_vue_vue_type_template_id_5cec6160___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
-
-
-
-/***/ }),
-
-/***/ "./resources/js/components/LobbyComponent.vue":
-/*!****************************************************!*\
-  !*** ./resources/js/components/LobbyComponent.vue ***!
-  \****************************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _LobbyComponent_vue_vue_type_template_id_24d28172___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./LobbyComponent.vue?vue&type=template&id=24d28172& */ "./resources/js/components/LobbyComponent.vue?vue&type=template&id=24d28172&");
-/* harmony import */ var _LobbyComponent_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./LobbyComponent.vue?vue&type=script&lang=js& */ "./resources/js/components/LobbyComponent.vue?vue&type=script&lang=js&");
-/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
-
-
-
-
-
-/* normalize component */
-
-var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
-  _LobbyComponent_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
-  _LobbyComponent_vue_vue_type_template_id_24d28172___WEBPACK_IMPORTED_MODULE_0__["render"],
-  _LobbyComponent_vue_vue_type_template_id_24d28172___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
-  false,
-  null,
-  null,
-  null
-  
-)
-
-/* hot reload */
-if (false) { var api; }
-component.options.__file = "resources/js/components/LobbyComponent.vue"
-/* harmony default export */ __webpack_exports__["default"] = (component.exports);
-
-/***/ }),
-
-/***/ "./resources/js/components/LobbyComponent.vue?vue&type=script&lang=js&":
-/*!*****************************************************************************!*\
-  !*** ./resources/js/components/LobbyComponent.vue?vue&type=script&lang=js& ***!
-  \*****************************************************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_LobbyComponent_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/babel-loader/lib??ref--4-0!../../../node_modules/vue-loader/lib??vue-loader-options!./LobbyComponent.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/LobbyComponent.vue?vue&type=script&lang=js&");
-/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_LobbyComponent_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
-
-/***/ }),
-
-/***/ "./resources/js/components/LobbyComponent.vue?vue&type=template&id=24d28172&":
-/*!***********************************************************************************!*\
-  !*** ./resources/js/components/LobbyComponent.vue?vue&type=template&id=24d28172& ***!
-  \***********************************************************************************/
-/*! exports provided: render, staticRenderFns */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_LobbyComponent_vue_vue_type_template_id_24d28172___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../node_modules/vue-loader/lib??vue-loader-options!./LobbyComponent.vue?vue&type=template&id=24d28172& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/LobbyComponent.vue?vue&type=template&id=24d28172&");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_LobbyComponent_vue_vue_type_template_id_24d28172___WEBPACK_IMPORTED_MODULE_0__["render"]; });
-
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_LobbyComponent_vue_vue_type_template_id_24d28172___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
 
 
 

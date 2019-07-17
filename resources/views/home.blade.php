@@ -2,6 +2,6 @@
 
 @section('content')
 	<div class="container-fluid">
-	  <lobby-component :logged_user="{{ json_encode(auth()->user()) }}"></lobby-component>
+	  <game-component :logged_user="{{ json_encode(auth()->user()) }}"></game-component>
 	</div>
 @endsection
