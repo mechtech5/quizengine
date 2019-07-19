@@ -3,10 +3,11 @@
 namespace App\Http\Controllers\Api;
 
 use App\Events\FriendIsHere;
+use App\Http\Controllers\Controller;
+use App\Models\Question;
 use App\Models\Round;
 use App\User;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 
 class RoundController extends Controller
 {
@@ -27,28 +28,35 @@ class RoundController extends Controller
 
   public function join(User $user)
   {
+    $res = array();
     $vdata = request()->validate([
       'code' => 'required'
     ]);
 
     $round = Round::where('code', $vdata['code'])->where('status', 0)->first();
-    if($round)
-    {
-      $round->player_2 = $user->id;
-      $round->status = 1;
-      $round->save();
+    $round->player_2 = $user->id;
+    $round->status = 1;
+    $round->save();
+    
+    broadcast(new FriendIsHere())->toOthers();
 
-      broadcast(new FriendIsHere($user))->toOthers();
+    $res['round'] = $round;
+    $res['opponent'] = User::where('id', $round->player_1)->first();
+    $res['questions'] = Question::where('topic_id', $round->topic_id)->get();
 
-      return response()->json($round, 200);
-    }
-    else
-    {
-      return 'Not Found';
-    }
+    return response()->json($res, 200);
   }
 
   public function show(Round $round) {
     return response()->json($round, 200);
+  }
+
+  public function start(Round $round) {
+    $res = array();
+    $res['round'] = $round;
+    $res['opponent'] = User::where('id', $round->player_2)->first();
+    $res['questions'] = Question::where('topic_id', $round->topic_id)->get();
+
+    return response()->json($res, 200);
   }
 }

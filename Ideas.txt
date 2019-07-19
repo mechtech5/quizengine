@@ -1,2 +1,3 @@
-Make a single component for now out of the current 2 
+Make a single component for now out of the current 2 [DONE]
 Bring questions when both players ready and start the play.
+Only bring next question when event fired.

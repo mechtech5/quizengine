@@ -66,14 +66,9 @@
 
 			Echo.channel('game')
         .listen('FriendIsHere', (e) => {
-          let id = this.round.id;
-          axios.get(`/api/rounds/${id}`).then(response => {
-            this.round = response.data;
-            console.log('FriendIsHere', response.data);
-          })
-          this.opponent = e.user;
-          this.started = true;
-      });
+         	this.opponent = e.user;
+          this.startGame();
+      });  
 		},
 		methods: {
 			create() {
@@ -89,15 +84,19 @@
         if(this.input_code.length === 6) {
           axios.post(`/api/rounds/join/${this.me.id}`, {code: this.input_code}).then(response => {
             console.log('Join', response.data);
-            this.round = response.data;
-            axios.get(`/api/users/${response.data.player_1}`).then(response => {
-              this.opponent = response.data;
-            })
-            this.started = true;
+            this.round = response.data.round;
+            this.opponent = response.data.opponent;
+            this.questions = response.data.questions;
           }).catch(error => console.log(error.response.data));
         } else {
           alert('Invalid Code!');
         }
+      },
+
+      startGame() {
+      	axios.post(`/api/rounds/start/${this.round.id}`).then(response => {
+      		this.questions = response.data;
+      	}).catch(error => console.log(error.response.data));
       },
 
 			ask() {
@@ -108,16 +107,13 @@
 			},
 
 			// Utils
-			getQuestions(topic_id) {
-				axios.get(`/api/questions/${topic_id}`).then(response => {
-					this.questions = response.data;
+			startGame() {
+				axios.post(`/api/rounds/start/${this.round.id}`).then(response => {
+					this.round = response.data.round;
+					this.opponent = response.data.opponent;
+					this.questions = response.data.questions;
 				}).catch(error => console.log(error.response.data));
 			},
-			getPlayerDetails(id) {
-				axios.get(`/api/users/${id}`).then(response => {
-					this.player_2 = response.data;
-				}).catch(error => console.log(error.response.data));
-			}
 		}
 	}
 </script>

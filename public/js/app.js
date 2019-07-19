@@ -1838,6 +1838,8 @@ module.exports = {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 //
 //
 //
@@ -1903,16 +1905,12 @@ __webpack_require__.r(__webpack_exports__);
 
     this.me = this.logged_user;
     Echo.channel('game').listen('FriendIsHere', function (e) {
-      var id = _this.round.id;
-      axios.get("/api/rounds/".concat(id)).then(function (response) {
-        _this.round = response.data;
-        console.log('FriendIsHere', response.data);
-      });
       _this.opponent = e.user;
-      _this.started = true;
+
+      _this.startGame();
     });
   },
-  methods: {
+  methods: _defineProperty({
     create: function create() {
       var _this2 = this;
 
@@ -1933,11 +1931,9 @@ __webpack_require__.r(__webpack_exports__);
           code: this.input_code
         }).then(function (response) {
           console.log('Join', response.data);
-          _this3.round = response.data;
-          axios.get("/api/users/".concat(response.data.player_1)).then(function (response) {
-            _this3.opponent = response.data;
-          });
-          _this3.started = true;
+          _this3.round = response.data.round;
+          _this3.opponent = response.data.opponent;
+          _this3.questions = response.data.questions;
         })["catch"](function (error) {
           return console.log(error.response.data);
         });
@@ -1945,28 +1941,28 @@ __webpack_require__.r(__webpack_exports__);
         alert('Invalid Code!');
       }
     },
-    ask: function ask() {},
-    check: function check() {},
-    // Utils
-    getQuestions: function getQuestions(topic_id) {
+    startGame: function startGame() {
       var _this4 = this;
 
-      axios.get("/api/questions/".concat(topic_id)).then(function (response) {
+      axios.post("/api/rounds/start/".concat(this.round.id)).then(function (response) {
         _this4.questions = response.data;
       })["catch"](function (error) {
         return console.log(error.response.data);
       });
     },
-    getPlayerDetails: function getPlayerDetails(id) {
-      var _this5 = this;
+    ask: function ask() {},
+    check: function check() {}
+  }, "startGame", function startGame() {
+    var _this5 = this;
 
-      axios.get("/api/users/".concat(id)).then(function (response) {
-        _this5.player_2 = response.data;
-      })["catch"](function (error) {
-        return console.log(error.response.data);
-      });
-    }
-  }
+    axios.post("/api/rounds/start/".concat(this.round.id)).then(function (response) {
+      _this5.round = response.data.round;
+      _this5.opponent = response.data.opponent;
+      _this5.questions = response.data.questions;
+    })["catch"](function (error) {
+      return console.log(error.response.data);
+    });
+  })
 });
 
 /***/ }),
