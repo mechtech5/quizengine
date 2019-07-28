@@ -23,14 +23,21 @@
 					</div>		
 				</div>
 				<hr>
-				<span class="row" v-if="started">
+				<span class="row">
 		    	<div class="col-3">
 		    		<p v-text="me.name"></p>
 		    		<p v-text="round.score_1"></p>
 		    	</div>
-		    	<div class="col-6">
-		    		<p v-text="round.question"></p>
-		    		<button class="btn" v-for="(value, name) in round.options" @click="check(name)" v-text="value"></button>
+		    	<div class="col-6 text-center">
+		    		<span v-for="quest in questions" :key="quest.id">
+		    			<p>Question No. {{ quest.id }}</p>
+		    			<h3 v-text="quest.ques"></h3>
+		    			<button class="btn btn-primary m-2" 
+		    				v-for="(value, name) in JSON.parse(quest.options)" 
+		    				@click="checkAnswer(quest name)" 
+		    				v-text="value"></button>
+		    		</span>
+		    		
 		    	</div>
 		    	<div class="col-3 text-right">
 		    		<p v-text="opponent.name"></p>
@@ -51,6 +58,7 @@
 				started: false,
 				is_initiator: false,
 				input_code: '',
+				started: false,
 
 				// Players
 				me: {},
@@ -66,7 +74,6 @@
 
 			Echo.channel('game')
         .listen('FriendIsHere', (e) => {
-         	this.opponent = e.user;
           this.startGame();
       });  
 		},
@@ -74,7 +81,8 @@
 			create() {
         axios.post(`/api/rounds/create/${this.me.id}`, {}).then(response => {
           console.log('Create', response.data);
-          this.round = response.data;
+          this.round = response.data.round;
+          this.questions = response.data.questions;
           this.is_initiator = true;
           alert('Share this code '+this.round.code+' with your friend');
         }).catch(error => console.log(error.response.data));
@@ -87,22 +95,16 @@
             this.round = response.data.round;
             this.opponent = response.data.opponent;
             this.questions = response.data.questions;
+            this.started = true;
           }).catch(error => console.log(error.response.data));
         } else {
           alert('Invalid Code!');
         }
       },
-
-      startGame() {
-      	axios.post(`/api/rounds/start/${this.round.id}`).then(response => {
-      		this.questions = response.data;
-      	}).catch(error => console.log(error.response.data));
-      },
-
 			ask() {
 
 			},
-			check() {
+			checkAnswer(ans) {
 
 			},
 
@@ -111,7 +113,7 @@
 				axios.post(`/api/rounds/start/${this.round.id}`).then(response => {
 					this.round = response.data.round;
 					this.opponent = response.data.opponent;
-					this.questions = response.data.questions;
+					this.started = true;
 				}).catch(error => console.log(error.response.data));
 			},
 		}

@@ -1883,40 +1883,42 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: ['logged_user'],
   data: function data() {
-    return {
+    var _ref;
+
+    return _ref = {
       // Game
       round: {},
       started: false,
       is_initiator: false,
-      input_code: '',
-      // Players
-      me: {},
-      opponent: {},
-      // Quiz
-      timer: 10,
-      questions: []
-    };
+      input_code: ''
+    }, _defineProperty(_ref, "started", false), _defineProperty(_ref, "me", {}), _defineProperty(_ref, "opponent", {}), _defineProperty(_ref, "timer", 10), _defineProperty(_ref, "questions", []), _ref;
   },
   mounted: function mounted() {
     var _this = this;
 
     this.me = this.logged_user;
     Echo.channel('game').listen('FriendIsHere', function (e) {
-      _this.opponent = e.user;
-
       _this.startGame();
     });
   },
-  methods: _defineProperty({
+  methods: {
     create: function create() {
       var _this2 = this;
 
       axios.post("/api/rounds/create/".concat(this.me.id), {}).then(function (response) {
         console.log('Create', response.data);
-        _this2.round = response.data;
+        _this2.round = response.data.round;
+        _this2.questions = response.data.questions;
         _this2.is_initiator = true;
         alert('Share this code ' + _this2.round.code + ' with your friend');
       })["catch"](function (error) {
@@ -1934,6 +1936,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
           _this3.round = response.data.round;
           _this3.opponent = response.data.opponent;
           _this3.questions = response.data.questions;
+          _this3.started = true;
         })["catch"](function (error) {
           return console.log(error.response.data);
         });
@@ -1941,28 +1944,21 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         alert('Invalid Code!');
       }
     },
+    ask: function ask() {},
+    checkAnswer: function checkAnswer(ans) {},
+    // Utils
     startGame: function startGame() {
       var _this4 = this;
 
       axios.post("/api/rounds/start/".concat(this.round.id)).then(function (response) {
-        _this4.questions = response.data;
+        _this4.round = response.data.round;
+        _this4.opponent = response.data.opponent;
+        _this4.started = true;
       })["catch"](function (error) {
         return console.log(error.response.data);
       });
-    },
-    ask: function ask() {},
-    check: function check() {}
-  }, "startGame", function startGame() {
-    var _this5 = this;
-
-    axios.post("/api/rounds/start/".concat(this.round.id)).then(function (response) {
-      _this5.round = response.data.round;
-      _this5.opponent = response.data.opponent;
-      _this5.questions = response.data.questions;
-    })["catch"](function (error) {
-      return console.log(error.response.data);
-    });
-  })
+    }
+  }
 });
 
 /***/ }),
@@ -47401,132 +47397,8 @@ exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
-var render = function() {
-  var _vm = this
-  var _h = _vm.$createElement
-  var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "card" }, [
-    _c("div", { staticClass: "card-header" }, [
-      _vm._v("QuizEngine\n\t\t"),
-      _c("span", {
-        staticClass: "float-right",
-        domProps: { textContent: _vm._s(this.round.code) }
-      })
-    ]),
-    _vm._v(" "),
-    _c("div", { staticClass: "card-body" }, [
-      !_vm.started
-        ? _c("div", { staticClass: "container" }, [
-            _c("div", { staticClass: "row justify-content-center" }, [
-              _c("div", { staticClass: "col-md-8" }, [
-                _c("div", { staticClass: "text-center" }, [
-                  _c(
-                    "button",
-                    {
-                      staticClass: "btn btn-outline-secondary",
-                      on: {
-                        click: function($event) {
-                          return _vm.create()
-                        }
-                      }
-                    },
-                    [_vm._v("Create")]
-                  )
-                ]),
-                _vm._v(" "),
-                _c("br"),
-                _vm._v(" "),
-                _c("p", { staticClass: "text-center" }, [_vm._v("OR")]),
-                _vm._v(" "),
-                _c("div", { staticClass: "input-group mb-3" }, [
-                  _c("input", {
-                    directives: [
-                      {
-                        name: "model",
-                        rawName: "v-model",
-                        value: _vm.input_code,
-                        expression: "input_code"
-                      }
-                    ],
-                    staticClass: "form-control",
-                    attrs: { type: "text", placeholder: "Enter the code" },
-                    domProps: { value: _vm.input_code },
-                    on: {
-                      input: function($event) {
-                        if ($event.target.composing) {
-                          return
-                        }
-                        _vm.input_code = $event.target.value
-                      }
-                    }
-                  }),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "input-group-append" }, [
-                    _c(
-                      "button",
-                      {
-                        staticClass: "btn btn-outline-secondary",
-                        attrs: { type: "button" },
-                        on: {
-                          click: function($event) {
-                            return _vm.join()
-                          }
-                        }
-                      },
-                      [_vm._v("\n\t\t\t\t          Join")]
-                    )
-                  ])
-                ])
-              ])
-            ])
-          ])
-        : _vm._e(),
-      _vm._v(" "),
-      _c("hr"),
-      _vm._v(" "),
-      _vm.started
-        ? _c("span", { staticClass: "row" }, [
-            _c("div", { staticClass: "col-3" }, [
-              _c("p", { domProps: { textContent: _vm._s(_vm.me.name) } }),
-              _vm._v(" "),
-              _c("p", { domProps: { textContent: _vm._s(_vm.round.score_1) } })
-            ]),
-            _vm._v(" "),
-            _c(
-              "div",
-              { staticClass: "col-6" },
-              [
-                _c("p", {
-                  domProps: { textContent: _vm._s(_vm.round.question) }
-                }),
-                _vm._v(" "),
-                _vm._l(_vm.round.options, function(value, name) {
-                  return _c("button", {
-                    staticClass: "btn",
-                    domProps: { textContent: _vm._s(value) },
-                    on: {
-                      click: function($event) {
-                        return _vm.check(name)
-                      }
-                    }
-                  })
-                })
-              ],
-              2
-            ),
-            _vm._v(" "),
-            _c("div", { staticClass: "col-3 text-right" }, [
-              _c("p", { domProps: { textContent: _vm._s(_vm.opponent.name) } }),
-              _vm._v(" "),
-              _c("p", { domProps: { textContent: _vm._s(_vm.round.score_2) } })
-            ])
-          ])
-        : _vm._e()
-    ])
-  ])
-}
+var render = function () {}
 var staticRenderFns = []
-render._withStripped = true
 
 
 

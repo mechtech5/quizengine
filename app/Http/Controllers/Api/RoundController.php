@@ -14,6 +14,7 @@ class RoundController extends Controller
   // Creating a round for play
   public function create(User $user)
   {
+    $res = array();
     $permitted_chars = '0123456789abcdefghijklmnopqrstuvwxyz';
 
   	$round = Round::create([
@@ -22,8 +23,10 @@ class RoundController extends Controller
     ]);
 
     $round = Round::findOrFail($round->id);
+  	$res['round'] = $round;
+    $res['questions'] = Question::where('topic_id', $round->topic_id)->get();
 
-  	return response()->json($round, 201);
+    return response()->json($res, 200);
   }
 
   public function join(User $user)
@@ -33,18 +36,30 @@ class RoundController extends Controller
       'code' => 'required'
     ]);
 
-    $round = Round::where('code', $vdata['code'])->where('status', 0)->first();
-    $round->player_2 = $user->id;
-    $round->status = 1;
-    $round->save();
-    
-    broadcast(new FriendIsHere())->toOthers();
+    $round = Round::where('code', $vdata['code'])
+      ->where('player_1', '!=', $user->id)
+      ->where('status', '', 0)
+      ->first();
 
-    $res['round'] = $round;
-    $res['opponent'] = User::where('id', $round->player_1)->first();
-    $res['questions'] = Question::where('topic_id', $round->topic_id)->get();
+    if($round)
+    {
+      $round->player_2 = $user->id;
+      $round->status = 1;
+      $round->save();
+      
+      broadcast(new FriendIsHere())->toOthers();
 
-    return response()->json($res, 200);
+      $res['round'] = $round;
+      $res['opponent'] = User::where('id', $round->player_1)->first();
+      $res['questions'] = Question::where('topic_id', $round->topic_id)->get();
+
+      return response()->json($res, 200);
+    }
+    else
+    {
+      $res = 'Not Allowed!';
+      return response()->json($res, 422);
+    }
   }
 
   public function show(Round $round) {
